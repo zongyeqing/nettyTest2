@@ -8,7 +8,7 @@ import netty.rpc.annotation.RemoteService;
  * @author 宗业清
  * @since 2018年03月23日
  */
-@RemoteService
+@RemoteService(Calculate.class)
 public class CalculateImpl implements Calculate {
     
     public int add(int a, int b) {

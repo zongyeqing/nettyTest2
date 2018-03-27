@@ -8,5 +8,5 @@ public interface ServiceRegistry {
     /**
      * 服务注册
      */
-    void register();
+    void register(String serviceName, String serviceAddress);
 }

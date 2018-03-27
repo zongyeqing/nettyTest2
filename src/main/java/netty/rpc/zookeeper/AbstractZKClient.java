@@ -38,14 +38,14 @@ public class AbstractZKClient {
     /**
      * zookeeper客户端
      */
-    private ZkClient zkClient;
+    protected ZkClient zkClient;
     
     public AbstractZKClient(){
         initProperties();
         zkClient = new ZkClient(zkAddress, sessionTimeOut, connectionTimeOut);
     }
 
-    protected void initProperties() {
+    private void initProperties() {
         Properties properties = null;
         try{
             properties = PropertiesLoaderUtils.loadAllProperties("zookeeper.properties");

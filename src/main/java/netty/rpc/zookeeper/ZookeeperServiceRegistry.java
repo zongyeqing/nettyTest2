@@ -1,66 +1,35 @@
 package netty.rpc.zookeeper;
 
-import org.I0Itec.zkclient.ZkClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author 宗叶青 2018/3/25 22:16
  */
-public class ZookeeperServiceRegistry implements ServiceRegistry {
+public class ZookeeperServiceRegistry extends AbstractZKClient implements ServiceRegistry {
 
-    /**
-     * zk 地址
-     */
-    private String zkAddress;
-    /**
-     * 会话超时时间
-     */
-    private int sessionTimeOut;
-    /**
-     * 连接超时时间
-     */
-    private int connectionTimeOut;
+    /** 日志记录器 */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperServiceRegistry.class);
 
-    /**
-     * zookeeper客户端
-     */
-    private ZkClient zkClient;
+   
 
     public ZookeeperServiceRegistry() {
-        zkClient = new ZkClient(zkAddress, sessionTimeOut, connectionTimeOut);
+        super();
     }
-
-    public ZookeeperServiceRegistry(String zkAddress, int sessionTimeOut, int connectionTimeOut) {
-        this.zkAddress = zkAddress;
-        this.sessionTimeOut = sessionTimeOut;
-        this.connectionTimeOut = connectionTimeOut;
-        zkClient = new ZkClient(zkAddress, sessionTimeOut, connectionTimeOut);
+    
+    public void register(String serviceName, String serviceAddress) {
+        if (!zkClient.exists(REGISTRY_PATH)) {
+            zkClient.createPersistent(REGISTRY_PATH);
+            LOGGER.info("create zookeeper node: {}", REGISTRY_PATH);
+        }
+        String servicePath = REGISTRY_PATH + "/" + serviceName;
+        if (!zkClient.exists(servicePath)) {
+            zkClient.createPersistent(servicePath);
+            LOGGER.info("create zookeeper node: {}", serviceAddress);
+        }
+        String addressPath = servicePath + "/" + "address-";
+        String addressNode = zkClient.createEphemeralSequential(addressPath, serviceAddress);
+        LOGGER.info("create zookeeper node: {}", addressNode);
     }
-
-    public void register() {
-
-    }
-
-    public String getZkAddress() {
-        return zkAddress;
-    }
-
-    public void setZkAddress(String zkAddress) {
-        this.zkAddress = zkAddress;
-    }
-
-    public int getSessionTimeOut() {
-        return sessionTimeOut;
-    }
-
-    public void setSessionTimeOut(int sessionTimeOut) {
-        this.sessionTimeOut = sessionTimeOut;
-    }
-
-    public int getConnectionTimeOut() {
-        return connectionTimeOut;
-    }
-
-    public void setConnectionTimeOut(int connectionTimeOut) {
-        this.connectionTimeOut = connectionTimeOut;
-    }
+    
 }

@@ -6,13 +6,12 @@
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd">
-    <context:component-scan base-package="netty.rpc.core"/>
+    <context:component-scan base-package="netty.rpc">
+        <context:include-filter type="annotation" expression="netty.rpc.annotation.RemoteService"/>
+    </context:component-scan>
+    
     <context:property-placeholder location="classpath:rpc-server.properties"/>
     
-    
-    <bean class="netty.rpc.core.ScanPackage">
-        <property name="basePath" value="netty.rpc"/>
-    </bean>
     
     <bean id = "rpcServer" class="netty.rpc.core.MessageRecvExecutor">
         <constructor-arg name = "serverAddress" value = "${rpc.server.addr}"/>

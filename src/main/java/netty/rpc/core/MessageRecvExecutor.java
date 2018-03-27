@@ -1,5 +1,6 @@
 package netty.rpc.core;
 
+import static com.oracle.jrockit.jfr.ContentType.Bytes;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -7,12 +8,18 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import netty.rpc.annotation.RemoteService;
+import netty.rpc.zookeeper.ServiceRegistry;
+import netty.rpc.zookeeper.ZookeeperServiceRegistry;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +30,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * 请填写类注释
  *
- * @author 宗业清 
+ * @author 宗业清
  * @since 2018年03月22日
  */
 public class MessageRecvExecutor implements ApplicationContextAware, InitializingBean {
@@ -82,24 +89,29 @@ public class MessageRecvExecutor implements ApplicationContextAware, Initializin
     }
 
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-        ScanPackage scanPackage = ctx.getBean(ScanPackage.class);
-        List<Class> classes = scanPackage.scan();
-        for(Class clazz : classes) {
-            Annotation[] annotations = clazz.getAnnotations();
-            for(Annotation annotation : annotations) {
-                if(annotation.annotationType().equals(RemoteService.class)) {
-                    try {
-                        Object handler = clazz.newInstance();
-                        Class inter = clazz.getInterfaces()[0];
-                        String key = inter.getName();
-                        handlerMap.put(key, handler);
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
+        
+        ServiceRegistry serviceRegistry = new ZookeeperServiceRegistry();
+        //获取当前计算机的ip地址
+        String ip = null;
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            ip = address.getHostAddress();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("获取当前计算机ip错误");
+        }
+        //将本项目中含标有RemoteService注解的类添加到远程服务map中
+        Map<String, Object> serviceBeanMap = ctx.getBeansWithAnnotation(RemoteService.class);
+        if(!CollectionUtils.isEmpty(serviceBeanMap)) {
+            for (Map.Entry<String, Object> entry : serviceBeanMap.entrySet()) {
+                Object service = entry.getValue();
+                String interName = service.getClass().getAnnotation(RemoteService.class).value().getName();
+                handlerMap.put(interName, service);
+                //将服务注册到zookeeper中
+                serviceRegistry.register(interName, serverAddress);
             }
         }
+        
+        
+        
     }
 }
