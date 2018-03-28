@@ -1,5 +1,6 @@
 package netty.rpc;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -11,6 +12,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class start {
 
     public static void main(String[] args) {
-        new ClassPathXmlApplicationContext("classpath:config.xml");
+        ApplicationContext context =  new ClassPathXmlApplicationContext("classpath:config.xml");
+        SpringAutoWireTest sp = context.getBean(SpringAutoWireTest.class);
+        sp.test();
     }
 }

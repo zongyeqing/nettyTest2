@@ -29,6 +29,8 @@ public class MessageSendInitializeTask implements Runnable{
         this.loader = loader;
         this.seriabizedProtocol = seriabizedProtocol;
     }
+    
+    @Override
     public void run() {
         Bootstrap b = new Bootstrap();
         b.group(eventLoopGroup)
@@ -37,7 +39,8 @@ public class MessageSendInitializeTask implements Runnable{
 
         ChannelFuture channelFuture = b.connect(serverAddress);
         channelFuture.addListener(new ChannelFutureListener() {
-            public void operationComplete(final ChannelFuture channelFuture) throws Exception {
+            @Override
+            public void operationComplete(final ChannelFuture channelFuture) {
                 if (channelFuture.isSuccess()) {
                     MessageSendHandler handler = channelFuture.channel().pipeline().get(MessageSendHandler.class);
                     MessageSendInitializeTask.this.loader.setSendMessageHandler(handler);

@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="nettyRpc" />
         <module name="nettyTest2" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="nettyRpc" target="1.7" />
       <module name="nettyTest2" target="1.5" />
     </bytecodeTargetLevel>
   </component>

@@ -2,10 +2,12 @@ package netty.rpc.zookeeper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * @author 宗叶青 2018/3/25 22:16
  */
+@Component
 public class ZookeeperServiceRegistry extends AbstractZKClient implements ServiceRegistry {
 
     /** 日志记录器 */

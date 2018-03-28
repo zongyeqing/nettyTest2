@@ -19,6 +19,7 @@ public class MessageSendProxy<T> implements InvocationHandler {
         this.cls =cls;
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MessageRequest request = new MessageRequest();
         request.setMessageId(UUID.randomUUID().toString());

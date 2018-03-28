@@ -1,5 +1,7 @@
 package netty.rpc.model;
 
+import netty.rpc.annotation.RemoteService;
+
 import java.io.Serializable;
 import java.util.Arrays;
 

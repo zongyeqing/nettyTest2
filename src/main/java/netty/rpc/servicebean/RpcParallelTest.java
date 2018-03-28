@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 public class RpcParallelTest {
 
     public static void main(String[] args) throws Exception {
-        final MessageSendExecutor executor = new MessageSendExecutor("127.0.0.1:8888");
+        final MessageSendExecutor executor = new MessageSendExecutor("127.0.0.1:8080");
         //并发度 10000
         int parallel = 10000;
 

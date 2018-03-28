@@ -12,6 +12,7 @@ import netty.rpc.zookeeper.ServiceRegistry;
 import netty.rpc.zookeeper.ZookeeperServiceRegistry;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.CollectionUtils;
@@ -42,6 +43,9 @@ public class MessageRecvExecutor implements ApplicationContextAware, Initializin
 
     private static ThreadPoolExecutor threadPoolExecutor;
 
+    @Autowired
+    private ServiceRegistry serviceRegistry;
+
     public MessageRecvExecutor(String serverAddress) {
         this.serverAddress = serverAddress;
     }
@@ -57,6 +61,7 @@ public class MessageRecvExecutor implements ApplicationContextAware, Initializin
         threadPoolExecutor.submit(task);
     }
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         //netty的线程池模型设置成主从线程池模式， 这样可以应对高并发请求
         //当然netty还支持单线程、多线程网络IO模型，可以根据业务需求灵活配置
@@ -88,9 +93,9 @@ public class MessageRecvExecutor implements ApplicationContextAware, Initializin
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         
-        ServiceRegistry serviceRegistry = new ZookeeperServiceRegistry();
         //获取当前计算机的ip地址
         String ip = null;
         try {
@@ -104,14 +109,11 @@ public class MessageRecvExecutor implements ApplicationContextAware, Initializin
         if(!CollectionUtils.isEmpty(serviceBeanMap)) {
             for (Map.Entry<String, Object> entry : serviceBeanMap.entrySet()) {
                 Object service = entry.getValue();
-                String interName = service.getClass().getAnnotation(RemoteService.class).value().getName();
+                String interName = service.getClass().getName();
                 handlerMap.put(interName, service);
                 //将服务注册到zookeeper中
                 serviceRegistry.register(interName, serverAddress);
             }
         }
-        
-        
-        
     }
 }

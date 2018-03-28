@@ -20,7 +20,7 @@ public class MessageSendExecutor{
         loader.unLoad();
     }
     
-    public static <T> T execute(Class<T> rpcInterface) {
+    public <T> T execute(Class<T> rpcInterface) {
         return (T) Proxy.newProxyInstance(
         rpcInterface.getClassLoader(),
         new Class<?>[]{rpcInterface},

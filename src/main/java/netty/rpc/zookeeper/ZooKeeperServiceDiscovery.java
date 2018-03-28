@@ -2,6 +2,7 @@ package netty.rpc.zookeeper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Random;
  * @author 宗业清 
  * @since 2018年03月26日
  */
+@Component
 public class ZooKeeperServiceDiscovery extends AbstractZKClient implements ServiceDiscovery  {
 
     /** 日志记录器 */
@@ -21,7 +23,21 @@ public class ZooKeeperServiceDiscovery extends AbstractZKClient implements Servi
     public ZooKeeperServiceDiscovery() {
         super();
     }
+    
+    private static ZooKeeperServiceDiscovery serviceDiscovery; 
+    
+    public static ZooKeeperServiceDiscovery getInstance() {
+        if (serviceDiscovery == null) {
+            synchronized(ZooKeeperServiceDiscovery.class) {
+                if (serviceDiscovery == null) {
+                    serviceDiscovery = new ZooKeeperServiceDiscovery();
+                }
+            }
+        }
+       return serviceDiscovery;
+    }
 
+    @Override
     public String discover(String name) {
         List<String> services = zkClient.getChildren(REGISTRY_PATH);
         for(String service : services) {
@@ -36,7 +52,7 @@ public class ZooKeeperServiceDiscovery extends AbstractZKClient implements Servi
                     selectedService = addresses.get(0);
                 }
                 if (serviceNum > 1) {
-                    int range = serviceNum - 1;
+                    int range = serviceNum ;
                     int random = new Random().nextInt(range);
                     selectedService = addresses.get(random);
                 }
