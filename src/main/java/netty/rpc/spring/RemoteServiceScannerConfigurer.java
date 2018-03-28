@@ -17,7 +17,7 @@ import org.springframework.util.StringUtils;
 /**
  * 请填写类注释
  *
- * @author 宗业清 yeqing.zong@ucarinc.com
+ * @author 宗业清
  * @since 2018年03月28日
  */
 public class RemoteServiceScannerConfigurer implements BeanDefinitionRegistryPostProcessor,InitializingBean,ApplicationContextAware {
